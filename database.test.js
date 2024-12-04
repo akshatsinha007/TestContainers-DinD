@@ -10,7 +10,7 @@ describe('UserRepository', () => {
 
   beforeAll(async () => {
     // Start a PostgreSQL container
-    container = await new GenericContainer('postgres:15')
+    container = await new GenericContainer('postgres:14')
       .withEnvironment({
         POSTGRES_DB: 'testdb',
         POSTGRES_USER: 'testuser',

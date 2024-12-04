@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:23-alpine
 
 RUN apk add --no-cache docker-cli docker-compose
 
