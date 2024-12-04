@@ -1,0 +1,22 @@
+{
+    "name": "testcontainers-sample",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+      "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    },
+    "dependencies": {
+      "pg": "^8.11.3"
+    },
+    "devDependencies": {
+      "jest": "^29.7.0",
+      "testcontainers": "^10.2.2",
+      "@types/jest": "^29.5.11"
+    },
+    "jest": {
+      "transform": {},
+      "moduleNameMapper": {
+        "^(\\.{1,2}/.*)\\.js$": "$1"
+      }
+    }
+  }
