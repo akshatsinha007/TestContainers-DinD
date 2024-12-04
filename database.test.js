@@ -1,3 +1,4 @@
+// database.test.js
 import { GenericContainer } from 'testcontainers';
 import pg from 'pg';
 const { Pool } = pg;
@@ -9,28 +10,36 @@ describe('UserRepository', () => {
   let userRepository;
 
   beforeAll(async () => {
-    // Start a PostgreSQL container
-    container = await new GenericContainer('postgres:14')
-      .withEnvironment({
-        POSTGRES_DB: 'testdb',
-        POSTGRES_USER: 'testuser',
-        POSTGRES_PASSWORD: 'testpass'
-      })
-      .withExposedPorts(5432)
-      .start();
-
-    // Create connection pool
-    pool = new Pool({
-      host: container.getHost(),
-      port: container.getMappedPort(5432),
-      database: 'testdb',
-      user: 'testuser',
-      password: 'testpass'
-    });
-
-    // Initialize database schema
-    const client = await pool.connect();
     try {
+      // Use postgres:14 for broader compatibility
+      container = await new GenericContainer('postgres:14')
+        .withEnvironment({
+          POSTGRES_DB: 'testdb',
+          POSTGRES_USER: 'testuser',
+          POSTGRES_PASSWORD: 'testpass'
+        })
+        .withExposedPorts(5432)
+        .start();
+
+      // Create connection pool
+      pool = new Pool({
+        host: container.getHost(),
+        port: container.getMappedPort(5432),
+        database: 'testdb',
+        user: 'testuser',
+        password: 'testpass'
+      });
+
+      // Verify connection
+      const client = await pool.connect();
+      try {
+        await client.query('SELECT NOW()');
+        console.log('Database connection successful');
+      } finally {
+        client.release();
+      }
+
+      // Initialize database schema
       await client.query(`
         CREATE TABLE users (
           id SERIAL PRIMARY KEY,
@@ -38,21 +47,30 @@ describe('UserRepository', () => {
           email VARCHAR(100) UNIQUE NOT NULL
         )
       `);
-    } finally {
-      client.release();
-    }
 
-    // Create repository instance
-    userRepository = new UserRepository(pool);
-  }, 30000); // Increased timeout to allow container startup
+      // Create repository instance
+      userRepository = new UserRepository(pool);
+    } catch (error) {
+      console.error('Container startup error:', error);
+      throw error;
+    }
+  }, 60000);
 
   afterAll(async () => {
-    // Close database connection
-    await pool.end();
-    
-    // Stop the container
-    await container.stop();
-  });
+    try {
+      // Safely close pool if it exists
+      if (pool) {
+        await pool.end();
+      }
+      
+      // Stop the container if it exists
+      if (container) {
+        await container.stop();
+      }
+    } catch (error) {
+      console.error('Cleanup error:', error);
+    }
+  }, 10000);
 
   test('should create and retrieve a user', async () => {
     const user = await userRepository.createUser(
