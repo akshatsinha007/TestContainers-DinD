@@ -12,6 +12,7 @@ describe('UserRepository', () => {
   beforeAll(async () => {
     try {
       // Use postgres:14 for broader compatibility
+      process.env.DOCKER_HOST = 'unix:///var/run/docker.sock';
       container = await new GenericContainer('postgres:14')
         .withEnvironment({
           POSTGRES_DB: 'testdb',

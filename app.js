@@ -5,6 +5,7 @@ import { UserRepository } from './database.js';
 
 async function main() {
   // Start a PostgreSQL container
+  process.env.DOCKER_HOST = 'unix:///var/run/docker.sock';
   const container = await new GenericContainer('postgres:14')
     .withEnvironment({
       POSTGRES_DB: 'testdb',
