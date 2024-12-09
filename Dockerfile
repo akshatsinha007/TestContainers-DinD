@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci --cache /tmp/npm-cache
+RUN npm ci 
 
 COPY . .
 
