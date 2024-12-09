@@ -8,4 +8,6 @@ RUN npm ci --cache /tmp/npm-cache
 
 COPY . .
 
+RUN npm test
+
 CMD ["npm", "start"]
